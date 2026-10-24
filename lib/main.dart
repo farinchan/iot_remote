@@ -92,7 +92,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  _currentIndex == 0 ? 'Kontrol Relay (4 Modul)' : 'Monitor Suhu',
+                  _currentIndex == 0 ? 'Kontrol Relay' : 'Monitor Suhu',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],

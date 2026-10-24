@@ -31,7 +31,7 @@ class MqttManager extends ChangeNotifier {
   String _statusMessage = 'Belum terhubung';
 
   // MQTT Connection Settings
-  String server = 'broker.emqx.io';
+  String server = 'test.mosquitto.org';
   int port = 1883;
   late String clientId = 'flutter_iot_${Random().nextInt(999999)}';
   String username = '';

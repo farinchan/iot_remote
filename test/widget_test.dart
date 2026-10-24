@@ -13,7 +13,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Page 1 (Relay) UI elements
-    expect(find.text('Kontrol Relay (4 Modul)'), findsOneWidget);
+    expect(find.text('Kontrol Relay'), findsWidgets);
+    expect(find.text('Modul Relay 4 Channel'), findsOneWidget);
     expect(find.text('Master Saklar'), findsOneWidget);
     expect(find.text('Nyalakan Semua'), findsOneWidget);
     expect(find.text('Matikan Semua'), findsOneWidget);

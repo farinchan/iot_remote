@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../services/mqtt_manager.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -78,169 +77,6 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _showEsp32CodeModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.8,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (_, scrollController) => Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Contoh Kode ESP32 / Arduino',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(ctx),
-                  ),
-                ],
-              ),
-              const Divider(),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  children: [
-                    const Text(
-                      'Berikut template kode ESP32 menggunakan PubSubClient untuk 4 relay dan sensor DHT22/DHT11:',
-                      style: TextStyle(fontSize: 13),
-                    ),
-                    const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const SelectableText(
-                        '''// Template ESP32 IoT Remote (MQTT)
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include "DHT.h"
-
-const char* ssid = "NAMA_WIFI";
-const char* password = "PASSWORD_WIFI";
-const char* mqtt_server = "broker.emqx.io";
-
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-// Pin Relay (sesuaikan dengan board ESP32 Anda)
-const int relayPins[4] = {26, 27, 14, 12};
-
-#define DHTPIN 4
-#define DHTTYPE DHT11 // atau DHT22
-DHT dht(DHTPIN, DHTTYPE);
-
-unsigned long lastTempSend = 0;
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  String message;
-  for (int i = 0; i < length; i++) {
-    message += (char)payload[i];
-  }
-  
-  // Kontrol 4 Relay: iot/relay/1 .. 4
-  for (int i = 0; i < 4; i++) {
-    String expectedTopic = "iot/relay/" + String(i + 1);
-    if (String(topic) == expectedTopic) {
-      if (message == "1" || message == "ON") {
-        digitalWrite(relayPins[i], HIGH);
-      } else {
-        digitalWrite(relayPins[i], LOW);
-      }
-    }
-  }
-}
-
-void setup() {
-  Serial.begin(115200);
-  dht.begin();
-  for (int i = 0; i < 4; i++) {
-    pinMode(relayPins[i], OUTPUT);
-    digitalWrite(relayPins[i], LOW);
-  }
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) delay(500);
-
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
-}
-
-void loop() {
-  if (!client.connected()) {
-    while (!client.connected()) {
-      if (client.connect("ESP32_IoT_Client")) {
-        // Subscribe ke 4 Relay
-        for (int i = 1; i <= 4; i++) {
-          client.subscribe(("iot/relay/" + String(i)).c_str());
-        }
-      } else {
-        delay(3000);
-      }
-    }
-  }
-  client.loop();
-
-  // Kirim data suhu setiap 5 detik
-  if (millis() - lastTempSend > 5000) {
-    lastTempSend = millis();
-    float t = dht.readTemperature();
-    float h = dht.readHumidity();
-    if (!isnan(t)) {
-      String json = "{\\"suhu\\":" + String(t, 1) + ",\\"humidity\\":" + String(h, 1) + "}";
-      client.publish("iot/sensor/suhu", json.c_str());
-    }
-  }
-}''',
-                        style: TextStyle(
-                          color: Colors.greenAccent,
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Clipboard.setData(
-                          const ClipboardData(
-                            text: '''// ESP32 Arduino MQTT code
-#include <WiFi.h>
-#include <PubSubClient.h>
-// ...
-''',
-                          ),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Kode disalin ke clipboard')),
-                        );
-                      },
-                      icon: const Icon(Icons.copy, size: 16),
-                      label: const Text('Salin Kode ESP32'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isConnected = widget.mqtt.isConnected;
@@ -273,7 +109,7 @@ void loop() {
                     controller: _serverController,
                     decoration: const InputDecoration(
                       labelText: 'Server / Broker Host',
-                      hintText: 'e.g. broker.emqx.io atau 192.168.1.100',
+                      hintText: 'e.g. test.mosquitto.org atau 192.168.1.100',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.dns),
                     ),
@@ -446,25 +282,6 @@ void loop() {
             ],
           ),
           const SizedBox(height: 24),
-
-          // Guide card
-          Card(
-            color: Colors.teal.shade50,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.teal.shade200),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.code, color: Colors.teal),
-              title: const Text(
-                'Lihat Contoh Kode Arduino / ESP32',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              subtitle: const Text('Siap pakai untuk 4 Modul Relay & DHT Sensor'),
-              trailing: const Icon(Icons.chevron_right, color: Colors.teal),
-              onTap: _showEsp32CodeModal,
-            ),
-          ),
         ],
       ),
     );

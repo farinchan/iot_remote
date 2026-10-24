@@ -21,7 +21,7 @@ Aplikasi Flutter untuk kontrol remote IoT dan monitoring suhu real-time mengguna
    - Fitur **Simulasi Data**: tombol untuk menguji pengiriman data suhu langsung di aplikasi tanpa harus menunggu perangkat fisik.
 
 3. **Pengaturan Broker & Topik MQTT**
-   - Broker bawaan: `broker.emqx.io` (port `1883`) atau bisa diganti ke broker lain (HiveMQ, Mosquitto lokal, dsb).
+   - Broker bawaan: `test.mosquitto.org` (port `1883`) atau bisa diganti ke broker lain (HiveMQ, EMQX, Mosquitto lokal, dsb).
    - Client ID otomatis / kustom.
    - Dukungan autentikasi (Username & Password).
    - Kustomisasi prefix topik relay (default: `iot/relay/`) dan topik suhu (default: `iot/sensor/suhu`).
@@ -50,7 +50,7 @@ Aplikasi Flutter untuk kontrol remote IoT dan monitoring suhu real-time mengguna
 
 const char* ssid = "NAMA_WIFI_ANDA";
 const char* password = "PASSWORD_WIFI";
-const char* mqtt_server = "broker.emqx.io";
+const char* mqtt_server = "test.mosquitto.org";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
