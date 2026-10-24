@@ -66,5 +66,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Izin akses jaringan lokal untuk broker MQTT (iOS 14+) -->
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Aplikasi memerlukan izin akses jaringan lokal untuk berkomunikasi dengan broker MQTT dan modul IoT.</string>
 </dict>
 </plist>
